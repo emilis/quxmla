@@ -63,6 +63,10 @@ This is an output from parsing a couple of [Project Gutenberg](http://gutenberg.
     /rdf:RDF/rdf:Description    2   0   2
     /rdf:RDF/rdf:Description/dcterms:description    2   1   1
 
+Output is tab-delimited so you can easily copy-paste it into your spreadsheet for easier analysis:
+
+![QuXmlA output in a spreadsheet](http://emilis.info/other/quxmla-spreadsheet.png)
+
 
 ## Requirements
 
