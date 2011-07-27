@@ -1,13 +1,13 @@
 
 # QuXmlA <small>-- Quick Xml Analyzer</small>
 
-This script produces simple stats about tag paths in the given XML files:
+This script produces simple stats about _tag paths_ in the given XML files:
 
 - the total occurance of a tag path
 - the minimum number it appears in the parent tag path
 - the maximum number it appears in the parent tag path
 
-_Tag paths are tag names prefixed by parent tag names, e.g.:_ `/html/head/title`
+_Tag paths_ are tag names prefixed by parent tag names, e.g.: `/html/head/title`
 
 ## Usage
 
@@ -66,8 +66,7 @@ This is an output from parsing a couple of [Project Gutenberg](http://gutenberg.
 
 ## Requirements
 
-Python >= 2.6
-xml.sax
+Python >= 2.6 with xml.sax
 
 
 ## License
