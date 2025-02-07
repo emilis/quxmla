@@ -3,7 +3,7 @@
 #
 #    QuXmlA - Quick Xml Analyzer
 #
-#    Copyright (C) 2011 Emilis Dambauskas <emilis.d@gmail.com>
+#    Copyright (C) 2011, 2025 Emilis Dambauskas <dev@emilis.net>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,40 +27,40 @@ import xml.sax.handler
 class QuxmlaElementStats():
     """Stats for a path"""
 
-    def __init__(self):
-        
+    def __init__( self ):
+
         self.times_total = 1
         self.times_min = 0
         self.times_max = 0
         self.children = dict()
-    
-    
-    def printMe(self):
 
-        print "     {0}\t{1}\t{2}".format(
-                self.times_total,
-                self.times_min,
-                self.times_max)
+
+    def printMe( self ):
+
+        print( "     {0}\t{1}\t{2}".format(
+            self.times_total,
+            self.times_min,
+            self.times_max ))
         for p in self.children:
-            print "     {0}\t{1}".format(
-                    p,
-                    str(self.children[p]))
+            print( "     {0}\t{1}".format(
+                p,
+                str( self.children[p] )))
 
 
 class QuxmlaStats():
     """Stats for all elements"""
 
-    def __init__(self):
+    def __init__( self ):
 
         self.stats = dict()
 
 
-    def startElement(self, path, parentPath):
+    def startElement( self, path, parentPath ):
 
-        #print("startElement", path, parentPath)
+        #print( "startElement", path, parentPath )
 
         # Increase times_total an null all children counters:
-        if self.stats.has_key(path):
+        if self.stats.get( path ):
             el = self.stats[path]
             el.times_total += 1
             for p in el.children:
@@ -71,7 +71,7 @@ class QuxmlaStats():
         # Increase children counter on parent:
         if parentPath:
             pchildren = self.stats[parentPath].children
-            if pchildren.has_key(path):
+            if pchildren.get( path ):
                 pchildren[path] += 1
             else:
                 pchildren[path] = 1
@@ -80,132 +80,130 @@ class QuxmlaStats():
             el.times_min = None
             el.times_max = None
 
-    
-    def endElement(self, path):
+
+    def endElement( self, path ):
 
         el = self.stats[path]
-        #print("endElement    ", path, el.times_total, len(el.children))
+        #print( "endElement    ", path, el.times_total, len( el.children ))
 
         if el.times_total == 1:
             for p in el.children:
                 self_child = self.stats[p]
                 el_child_count = el.children[p]
-                #print("endElement-child", el.times_total, p, el_child_count)
+                #print( "endElement-child", el.times_total, p, el_child_count )
                 self_child.times_min = el_child_count;
                 self_child.times_max = el_child_count;
         else:
             for p in el.children:
                 self_child = self.stats[p]
                 el_child_count = el.children[p]
-                #print("endElement-child", el.times_total, p, el_child_count)
-                self_child.times_min = min(self_child.times_min, el_child_count)
-                self_child.times_max = max(self_child.times_max, el_child_count)
+                #print( "endElement-child", el.times_total, p, el_child_count )
+                self_child.times_min = min( self_child.times_min, el_child_count )
+                self_child.times_max = max( self_child.times_max, el_child_count )
 
 
 
 
-class QuxmlaHandler(xml.sax.handler.ContentHandler):
+class QuxmlaHandler( xml.sax.handler.ContentHandler ):
     """Quick XML ContentHandler"""
 
-    def __init__(self):
+    def __init__( self ):
 
         self.path = []
         self.pathStr = ""
         self.parentPathStr = ""
         self.stats = QuxmlaStats()
 
-    def startDocument(self):
+    def startDocument( self ):
 
-        self.stats.startElement("/", False)
+        self.stats.startElement( "/", False )
 
-    def endDocument(self):
+    def endDocument( self ):
 
-        self.stats.endElement("/")
+        self.stats.endElement( "/" )
 
-    
-    def startElement(self, name, attrs):
 
-        self.parentPathStr = "/" + "/".join(self.path)
-        self.path.append(name)
-        self.pathStr = "/" + "/".join(self.path)
+    def startElement( self, name, attrs ):
 
-        self.stats.startElement(self.pathStr, self.parentPathStr)
+        self.parentPathStr = "/" + "/".join( self.path )
+        self.path.append( name )
+        self.pathStr = "/" + "/".join( self.path )
 
-    
-    def endElement(self, name):
+        self.stats.startElement( self.pathStr, self.parentPathStr )
 
-        self.stats.endElement(self.pathStr)
+
+    def endElement( self, name ):
+
+        self.stats.endElement( self.pathStr )
         last = self.path.pop()
 
         if last != name:
-            raise AssertionError("Closing and opening tags do not match.")
+            raise AssertionError( "Closing and opening tags do not match." )
 
-        self.pathStr = "/" + "/".join(self.path)
+        self.pathStr = "/" + "/".join( self.path )
 
-    
-    def printResults(self):
 
-        print "Results:"
-        print ""
-        print "{0}\t{1}\t{2}\t{3}".format(
-                "path",
-                "found total",
-                "min(found in parent)",
-                "max(found in parent)")
+    def printResults( self ):
 
-        keys = self.stats.stats.keys()
-        keys.sort()
-        for p in keys:
+        print( "Results:" )
+        print( "" )
+        print( "{0}\t{1}\t{2}\t{3}".format(
+            "path",
+            "found total",
+            "min(found in parent)",
+            "max(found in parent)" ))
+
+        sorted_stats = dict( sorted( self.stats.stats.items() ));
+        for p in sorted_stats:
             el = self.stats.stats[p]
-            print "{0}\t{1}\t{2}\t{3}".format(
-                    p,
-                    el.times_total,
-                    el.times_min,
-                    el.times_max)
-        
+            print( "{0}\t{1}\t{2}\t{3}".format(
+                p,
+                el.times_total,
+                el.times_min,
+                el.times_max ))
+
         # Some debugging:
-        #for p in keys:
-        #    print(p)
+        #for p in sorted_stats:
+        #    print( p )
         #    self.stats.stats[p].printMe()
 
 
 
-def main(argv):
+def main( argv ):
 
     # Create XmlReader:
     parser = xml.sax.make_parser()
-    parser.setFeature(xml.sax.handler.feature_validation, False)
-    parser.setFeature(xml.sax.handler.feature_external_ges, False)
-    parser.setFeature(xml.sax.handler.feature_external_pes, False)
-    
+    parser.setFeature( xml.sax.handler.feature_validation, False )
+    parser.setFeature( xml.sax.handler.feature_external_ges, False )
+    parser.setFeature( xml.sax.handler.feature_external_pes, False )
+
     # Create an assign a handler to the parser:
     handler = QuxmlaHandler()
-    parser.setContentHandler(handler)
+    parser.setContentHandler( handler )
 
     # process all arguments as filenames:
     for f in argv:
-        print "Processing {0}...".format(f)
-        parser.parse(f)
-    
-    print ""
+        print( "Processing {0}...".format( f ))
+        parser.parse( f )
+
+    print( "" )
     handler.printResults()
 
 
 def usage():
 
-    print "Usage: $ python quxmla.py FILE [FILE] [FILE] ..."
+    print( "Usage: $ python quxmla.py FILE [FILE] [FILE] ..." )
 
 
 
 if __name__ == "__main__":
 
-    print "QuXmlA - Quick Xml Analyzer  Copyright (C) 2011 Emilis Dambauskas"
-    print "This program comes with ABSOLUTELY NO WARRANTY."
-    print "This is free software, and you are welcome to redistribute it under certain conditions; see LICENSE.txt for details."
-    print ""
-    
-    if len(sys.argv) > 1:
-        main(sys.argv[1:])
+    print( "QuXmlA - Quick Xml Analyzer  Copyright (C) 2011 Emilis Dambauskas" )
+    print( "This program comes with ABSOLUTELY NO WARRANTY." )
+    print( "This is free software, and you are welcome to redistribute it under certain conditions; see LICENSE.txt for details." )
+    print( "" )
+
+    if len( sys.argv ) > 1:
+        main( sys.argv[1:] )
     else:
         usage()
-        
